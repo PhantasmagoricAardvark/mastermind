@@ -1,0 +1,1 @@
+The game Mastermind(https://en.wikipedia.org/wiki/Mastermind_(board_game)) built with Ruby.
