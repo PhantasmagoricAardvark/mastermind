@@ -14,25 +14,53 @@ class Board
 		@@boards
 	end
 
+	def save
+		@@boards.push(@@board)
+		puts @@boards
+	end
+
 	def self.add_color(num, color_num)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
-		p @@boards.class
-		p @@boards.push("1|2|3|4")
-		@@boards.push(@@board.sub!(num.to_s,@colors[color_num])).to_s
+		@@board.sub!(num.to_s,@colors[color_num])
 	end
 end
 
 class Player
-	def color(num)
-		nums = [1,2,3,4,5,6]
-		puts "Input a color number for position #{num}."
-		color_num = gets.chomp.to_i
-		until nums.include?(color_num)
-			puts "Input a valid color number for position #{num}."
-			color_num = gets.chomp.to_i
+	def choose_colors
+		puts "Input 4 numbers for each position respectively."
+		color_nums = gets.chomp.to_s
 
+		until color_nums.length != 4 || string_checker(color_nums)
+			puts "4 numbers please."
+			color_nums = gets.chomp.to_s
 		end
-		Board.add_color(num,color_num.to_i)
+		Board.add_color(1,color_nums[0].to_i)
+		Board.add_color(2,color_nums[1].to_i)
+		Board.add_color(3,color_nums[2].to_i)
+		Board.add_color(4,color_nums[3].to_i)
+
+	end
+
+	def string_checker(string)
+		nums = [1,2,3,4,5,6]
+		i = 0
+		puts string
+		while i < 4
+			if nums.include?(string[i].to_i) == false
+				return false
+			end
+			i += 1
+		end
+		true
+	end	
+end
+
+class Computer
+	@@code = "1|2|3|4"
+	def make_secret_code
+		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
+		@@code = "#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}"
+		puts @@code
 	end
 end
 	
@@ -51,12 +79,13 @@ class Moderator
 			player.color(2)
 			player.color(3)
 			player.color(4)
-			board.board_reset
-			p
+			board.save
 			puts
 			puts "Board: " + board.display
+			board.board_reset
 		end
 	end
 end
 
-Moderator.game
+player = Player.new
+puts player.choose_colors
