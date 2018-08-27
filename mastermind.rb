@@ -1,6 +1,6 @@
 class Board
 	@@board = "1|2|3|4"
-	@@boards = []
+	@@boards = ["grn|wht|blc|red"]
 
 	def display
 		return @@board
@@ -16,12 +16,21 @@ class Board
 
 	def save
 		@@boards.push(@@board)
-		puts @@boards
+		puts "boards = #{@@boards}"
 	end
 
 	def self.add_color(num, color_num)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
 		@@board.sub!(num.to_s,@colors[color_num])
+	end
+
+	def self.receive_feedback(code)
+		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
+		comparison_code = @@boards[-1]
+		comparison_code = "#{@colors.key(comparison_code[0..2])}#{@colors.key(comparison_code[4..6])}#{@colors.key(comparison_code[8..10])}#{@colors.key(comparison_code[12..14])}"
+		puts "code is #{code}"
+		puts comparison_code
+
 	end
 end
 
@@ -29,7 +38,6 @@ class Player
 	def choose_colors
 		puts "Input 4 numbers for each position respectively."
 		color_nums = gets.chomp.to_s
-
 		until color_nums.length != 4 || string_checker(color_nums)
 			puts "4 numbers please."
 			color_nums = gets.chomp.to_s
@@ -38,7 +46,6 @@ class Player
 		Board.add_color(2,color_nums[1].to_i)
 		Board.add_color(3,color_nums[2].to_i)
 		Board.add_color(4,color_nums[3].to_i)
-
 	end
 
 	def string_checker(string)
@@ -62,6 +69,12 @@ class Computer
 		@@code = "#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}"
 		puts @@code
 	end
+
+	def feedback
+		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
+		@@code = "#{@colors.key(@@code[0..2])}#{@colors.key(@@code[4..6])}#{@colors.key(@@code[8..10])}#{@colors.key(@@code[12..14])}"
+		Board.receive_feedback(@@code)
+	end
 end
 	
 class Moderator
@@ -70,15 +83,14 @@ class Moderator
 	def self.game
 		board = Board.new
 		player = Player.new
+		computer = Computer.new
+		computer.make_secret_code
 		i = 0
 		puts board.display
 		while i < 12
 			puts
 			puts @@colors
-			player.color(1)
-			player.color(2)
-			player.color(3)
-			player.color(4)
+			player.choose_colors
 			board.save
 			puts
 			puts "Board: " + board.display
@@ -87,5 +99,7 @@ class Moderator
 	end
 end
 
-player = Player.new
-puts player.choose_colors
+computer = Computer.new
+computer.make_secret_code
+computer.feedback
+
