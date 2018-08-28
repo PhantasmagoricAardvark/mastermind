@@ -1,6 +1,6 @@
 class Board
 	@@board = "1|2|3|4"
-	@@boards = ["grn|wht|blc|red"]
+	@@boards = ["red|red|grn|red"]
 
 	def display
 		return @@board
@@ -24,13 +24,37 @@ class Board
 		@@board.sub!(num.to_s,@colors[color_num])
 	end
 
-	def self.receive_feedback(code)
+	def self.receive_feedback(secret_code)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
 		comparison_code = @@boards[-1]
+		i = 0
 		comparison_code = "#{@colors.key(comparison_code[0..2])}#{@colors.key(comparison_code[4..6])}#{@colors.key(comparison_code[8..10])}#{@colors.key(comparison_code[12..14])}"
-		puts "code is #{code}"
+		puts "secret_code is #{secret_code}"
 		puts comparison_code
+		if secret_code == comparison_code
+			return true
+		else
+			Board.correct_position(comparison_code, secret_code)
+		end
+	end
 
+	def self.correct_position(code1, secret_code)
+		i = 0
+		counter = 0
+		puts code1
+		puts secret_code
+		while i < 4
+			secret_code[i]
+			if code1.include?(secret_code[i])
+				puts "secret_code[i] is #{secret_code[i]}"
+				code1.to_s.split("").index(secret_code[i],secret_code.index(secret_code[i])) == secret_code.index(secret_code[i])
+				if code1.to_s.split("").index(secret_code[i],secret_code.index(secret_code[i])) == secret_code.index(secret_code[i])
+					counter += 1
+				end
+			end
+			i += 1
+		end
+		return puts counter
 	end
 end
 
