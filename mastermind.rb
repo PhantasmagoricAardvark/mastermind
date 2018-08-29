@@ -26,35 +26,40 @@ class Board
 
 	def self.receive_feedback(secret_code)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
-		comparison_code = @@boards[-1]
+		code1 = @@boards[-1]
 		i = 0
-		comparison_code = "#{@colors.key(comparison_code[0..2])}#{@colors.key(comparison_code[4..6])}#{@colors.key(comparison_code[8..10])}#{@colors.key(comparison_code[12..14])}"
+		code1 = "#{@colors.key(code1[0..2])}#{@colors.key(code1[4..6])}#{@colors.key(code1[8..10])}#{@colors.key(code1[12..14])}"
 		puts "secret_code is #{secret_code}"
-		puts comparison_code
-		if secret_code == comparison_code
+		if secret_code == code1
 			return true
 		else
-			Board.correct_position(comparison_code, secret_code)
+			puts "There are #{Board.correct_position(code1, secret_code)} colors in the correct position"
+			puts Board.wrong_position(code1, secret_code)
 		end
 	end
 
 	def self.correct_position(code1, secret_code)
 		i = 0
 		counter = 0
-		puts code1
-		puts secret_code
+		puts "code1 is #{code1}"
 		while i < 4
-			secret_code[i]
-			if code1.include?(secret_code[i])
-				puts "secret_code[i] is #{secret_code[i]}"
-				code1.to_s.split("").index(secret_code[i],secret_code.index(secret_code[i])) == secret_code.index(secret_code[i])
-				if code1.to_s.split("").index(secret_code[i],secret_code.index(secret_code[i])) == secret_code.index(secret_code[i])
-					counter += 1
-				end
+			if code1[i] == secret_code[i]
+				counter += 1
 			end
 			i += 1
 		end
-		return puts counter
+		return counter
+	end
+
+	def self.wrong_position(code1, secret_code)
+		counter = 0
+		i = 0
+		while i < code1.length
+			j = 0
+			puts secret_code.count(code1[i])
+			i += 1
+		end
+		counter
 	end
 end
 
@@ -91,7 +96,6 @@ class Computer
 	def make_secret_code
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
 		@@code = "#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}"
-		puts @@code
 	end
 
 	def feedback
