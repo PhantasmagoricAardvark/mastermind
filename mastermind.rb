@@ -29,11 +29,21 @@ class Board
 		code1 = @@boards[-1]
 		i = 0
 		code1 = "#{@colors.key(code1[0..2])}#{@colors.key(code1[4..6])}#{@colors.key(code1[8..10])}#{@colors.key(code1[12..14])}"
+		puts "secret_code is #{secret_code}"
+		puts "code1 is #{code1}"
 		if secret_code == code1
 			return true
 		else
-			# puts "There are #{Board.correct_position(code1, secret_code)} colors in the correct position"
-			puts Board.wrong_position(code1, secret_code)
+			if (Board.correct_position(code1, secret_code) == 1) && (Board.wrong_position(code1, secret_code) == 1)
+				puts "There is #{Board.correct_position(code1, secret_code)} color in the correct position, and #{Board.wrong_position(code1, secret_code)} correct color in the wrong position."
+			elsif (Board.correct_position(code1, secret_code) > 1 || Board.correct_position(code1, secret_code) == 0) && (Board.wrong_position(code1, secret_code) == 1)
+				puts "Here"
+				puts "There are #{Board.correct_position(code1, secret_code)} colors in the correct position, and #{Board.wrong_position(code1, secret_code)} correct color in the wrong position"
+			elsif (Board.correct_position(code1, secret_code) > 1 || Board.correct_position(code1, secret_code) == 0) && (Board.wrong_position(code1, secret_code) == 1)
+				puts "There is #{Board.correct_position(code1, secret_code)} color in the correct position, and #{Board.wrong_position(code1, secret_code)} correct colors in the wrong position."
+			else
+				puts "There are #{Board.correct_position(code1, secret_code)} colors in the correct position, and #{Board.wrong_position(code1, secret_code)} correct colors in the wrong position."
+			end
 		end
 	end
 
@@ -53,24 +63,29 @@ class Board
 		counter = 0
 		j = 0
 		i = 0
-		puts "secret_code is #{secret_code}"
-		puts "code1 is #{code1}"
+		puts code1
+		puts secret_code
+		while i < 4
+			if code1[i] == secret_code[i]
+				code1[i] = "0"
+				secret_code[i] = "x"
+			end
+			i += 1
+		end
+		i = 0
 		while j < 4
 			while i < code1.length
-				p code1
-				p secret_code
-				p code1 - secret_code
 				if secret_code.include?(code1[i]) && (secret_code.index(code1[i]) != code1.index(code1[i]))
 					counter += 1
 					secret_code.sub!(code1[i], "x")
-					i = 0
 					code1.sub!(code1[i], "0")
+					i = 0
 				end
 				i += 1
 			end
 			j += 1
 		end
-		counter
+		return counter
 	end
 end
 
@@ -107,7 +122,7 @@ class Computer
 	def make_secret_code
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
 		@@code = "#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}"
-		@@code = "grn|grn|grn|grn"
+		@@code = "ylw|grn|blc|ylw"
 	end
 
 	def feedback
