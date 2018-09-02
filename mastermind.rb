@@ -1,6 +1,6 @@
 class Board
 	@@board = "1|2|3|4"
-	@@boards = ["red|red|grn|red"]
+	@@boards = []
 
 	def display
 		return @@board
@@ -31,18 +31,19 @@ class Board
 		code1 = "#{@colors.key(code1[0..2])}#{@colors.key(code1[4..6])}#{@colors.key(code1[8..10])}#{@colors.key(code1[12..14])}"
 		puts "secret_code is #{secret_code}"
 		puts "code1 is #{code1}"
+		correct_position = Board.correct_position(code1, secret_code)
+		wrong_position = Board.wrong_position(code1, secret_code)
 		if secret_code == code1
-			return true
+			return p true
 		else
-			if (Board.correct_position(code1, secret_code) == 1) && (Board.wrong_position(code1, secret_code) == 1)
-				puts "There is #{Board.correct_position(code1, secret_code)} color in the correct position, and #{Board.wrong_position(code1, secret_code)} correct color in the wrong position."
-			elsif (Board.correct_position(code1, secret_code) > 1 || Board.correct_position(code1, secret_code) == 0) && (Board.wrong_position(code1, secret_code) == 1)
-				puts "Here"
-				puts "There are #{Board.correct_position(code1, secret_code)} colors in the correct position, and #{Board.wrong_position(code1, secret_code)} correct color in the wrong position"
-			elsif (Board.correct_position(code1, secret_code) > 1 || Board.correct_position(code1, secret_code) == 0) && (Board.wrong_position(code1, secret_code) == 1)
-				puts "There is #{Board.correct_position(code1, secret_code)} color in the correct position, and #{Board.wrong_position(code1, secret_code)} correct colors in the wrong position."
+			if (correct_position == 1) && (wrong_position == 1)
+				puts "There is #{correct_position} color in the correct position, and #{wrong_position} correct color in the wrong position."
+			elsif (correct_position > 1 || correct_position == 0) && (wrong_position == 1)
+				puts "There are #{correct_position} colors in the correct position, and #{wrong_position} correct color in the wrong position."
+			elsif (wrong_position > 1 || wrong_position == 0) && (correct_position == 1)
+				puts "There is #{correct_position} color in the correct position, and #{wrong_position} correct colors in the wrong position."
 			else
-				puts "There are #{Board.correct_position(code1, secret_code)} colors in the correct position, and #{Board.wrong_position(code1, secret_code)} correct colors in the wrong position."
+				puts "There are #{correct_position} colors in the correct position, and #{wrong_position} correct colors in the wrong position."
 			end
 		end
 	end
@@ -106,7 +107,6 @@ class Player
 	def string_checker(string)
 		nums = [1,2,3,4,5,6]
 		i = 0
-		puts string
 		while i < 4
 			if nums.include?(string[i].to_i) == false
 				return false
@@ -122,12 +122,12 @@ class Computer
 	def make_secret_code
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
 		@@code = "#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}"
-		@@code = "ylw|grn|blc|ylw"
+		@@code = "#{@colors.key(@@code[0..2])}#{@colors.key(@@code[4..6])}#{@colors.key(@@code[8..10])}#{@colors.key(@@code[12..14])}"
+
 	end
 
 	def feedback
-		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
-		@@code = "#{@colors.key(@@code[0..2])}#{@colors.key(@@code[4..6])}#{@colors.key(@@code[8..10])}#{@colors.key(@@code[12..14])}"
+		puts "@@code is #{@@code}"
 		Board.receive_feedback(@@code)
 	end
 end
@@ -147,6 +147,7 @@ class Moderator
 			puts @@colors
 			player.choose_colors
 			board.save
+			puts computer.feedback
 			puts
 			puts "Board: " + board.display
 			board.board_reset
@@ -154,7 +155,5 @@ class Moderator
 	end
 end
 
-computer = Computer.new
-computer.make_secret_code
-computer.feedback
+Moderator.game
 
