@@ -128,7 +128,7 @@ class Computer
 	end
 
 	def feedback
-		Board.receive_feedback(@code)
+		Board.receive_feedback(@code.dup)
 	end
 
 	def code
