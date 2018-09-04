@@ -1,6 +1,6 @@
 class Board
 	@@board = "1|2|3|4"
-	@@boards = []
+	@@boards = ["red|grn|blu|red"]
 
 	def display
 		return @@board
@@ -33,6 +33,7 @@ class Board
 		puts "code1 is #{code1}"
 		correct_position = Board.correct_position(code1, secret_code)
 		wrong_position = Board.wrong_position(code1, secret_code)
+		puts "wrong_position = #{wrong_position}"
 		if secret_code == code1
 			return p true
 		else
@@ -64,21 +65,22 @@ class Board
 		counter = 0
 		j = 0
 		i = 0
-		puts code1
-		puts secret_code
+		secret_code1 = ""
+		secret_code1 = secret_code
+		p secret_code
 		while i < 4
-			if code1[i] == secret_code[i]
+			if code1[i] == secret_code1[i]
 				code1[i] = "0"
-				secret_code[i] = "x"
+				secret_code1[i] = "x"
 			end
 			i += 1
 		end
 		i = 0
 		while j < 4
 			while i < code1.length
-				if secret_code.include?(code1[i]) && (secret_code.index(code1[i]) != code1.index(code1[i]))
+				if secret_code1.include?(code1[i]) && (secret_code1.index(code1[i]) != code1.index(code1[i]))
 					counter += 1
-					secret_code.sub!(code1[i], "x")
+					secret_code1.sub!(code1[i], "x")
 					code1.sub!(code1[i], "0")
 					i = 0
 				end
@@ -118,18 +120,21 @@ class Player
 end
 
 class Computer
-	@@code = "1|2|3|4"
 	def make_secret_code
+		@code = "1|2|3|4"
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
-		@@code = "#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}"
-		@@code = "#{@colors.key(@@code[0..2])}#{@colors.key(@@code[4..6])}#{@colors.key(@@code[8..10])}#{@colors.key(@@code[12..14])}"
-
+		@code = "#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}|#{@colors[rand(1..6)]}"
+		@code = "#{@colors.key(@code[0..2])}#{@colors.key(@code[4..6])}#{@colors.key(@code[8..10])}#{@colors.key(@code[12..14])}"
 	end
 
 	def feedback
-		puts "@@code is #{@@code}"
-		Board.receive_feedback(@@code)
+		Board.receive_feedback(@code)
 	end
+
+	def code
+		p @code
+	end
+
 end
 	
 class Moderator
@@ -141,14 +146,12 @@ class Moderator
 		computer = Computer.new
 		computer.make_secret_code
 		i = 0
-		puts board.display
 		while i < 12
 			puts
 			puts @@colors
 			player.choose_colors
 			board.save
 			puts computer.feedback
-			puts
 			puts "Board: " + board.display
 			board.board_reset
 		end
@@ -156,4 +159,3 @@ class Moderator
 end
 
 Moderator.game
-
