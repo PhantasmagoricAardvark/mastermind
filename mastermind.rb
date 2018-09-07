@@ -1,6 +1,6 @@
 class Board
 	@@board = "1|2|3|4"
-	@@boards = []
+	@@boards = ["red|red|red|grn"]
 
 	def display
 		@@board
@@ -18,17 +18,20 @@ class Board
 		@@boards.push(@@board)
 	end
 
-	def self.add_color(num, color_num)
+	def self.add_color(position, color_num)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
-		@@board.sub!(num.to_s,@colors[color_num])
+		p position.class
+		p color_num.class
+		@@board.sub!(position.to_s,@colors[color_num])
 	end
 
 	def self.feedback_for_computer(secret_code)
+		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
 		code1 = @@boards[-1]
-		p code1
-		p secret_code
+		code1 = "#{@colors.key(code1[0..2])}#{@colors.key(code1[4..6])}#{@colors.key(code1[8..10])}#{@colors.key(code1[12..14])}"
 		correct_position = Board.correct_position(code1, secret_code)
 		wrong_position = Board.wrong_position(code1, secret_code)
+		[correct_position, wrong_position]
 	end
 
 	def self.receive_feedback(secret_code)
@@ -128,15 +131,20 @@ class Player
 		puts "Choose the secret code!"
 		puts @colors
 		puts "Input 4 numbers."
-		secret_code = gets.chomp
-		until string_checker(secret_code)
+		@secret_code = gets.chomp
+		until string_checker(@secret_code)
 			puts "4 numbers please."
-			secret_code = gets.chomp
+			@secret_code = gets.chomp
 		end
+	end
+
+	def feedback
+		Board.feedback_for_computer(@secret_code.dup)
 	end
 end
 
 class Computer
+	@@i = -1
 	def make_secret_code
 		@code = "1|2|3|4"
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
@@ -145,9 +153,21 @@ class Computer
 	end
 
 	def feedback
-		Board.receive_feedback(@code.dup)
+		p Board.receive_feedback(@code.dup)
 	end
 
+	def color_chooser
+		@initial_guesses = [1111,2222,3333,4444,5555,6666]
+		@@i += 1
+		@initial_guesses[@@i]
+	end
+
+	def choose_colors
+		Board.add_color(1,@initial_guesses[@@i][0].to_i)
+		Board.add_color(2,@initial_guesses[@@i][1].to_i)
+		Board.add_color(3,@initial_guesses[@@i][2].to_i)
+		Board.add_color(4,@initial_guesses[@@i][3].to_i)
+	end
 end
 	
 class Moderator
@@ -224,6 +244,3 @@ class Moderator
 
 	end
 end
-
-player = Player.new
-player.make_secret_code
