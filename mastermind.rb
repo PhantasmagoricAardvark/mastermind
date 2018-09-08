@@ -1,6 +1,6 @@
 class Board
 	@@board = "1|2|3|4"
-	@@boards = ["red|red|red|grn"]
+	@@boards = []
 
 	def display
 		@@board
@@ -20,9 +20,7 @@ class Board
 
 	def self.add_color(position, color_num)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
-		p position.class
-		p color_num.class
-		@@board.sub!(position.to_s,@colors[color_num])
+		@@board.sub!(position.to_s,@colors[color_num.to_i])
 	end
 
 	def self.feedback_for_computer(secret_code)
@@ -31,7 +29,7 @@ class Board
 		code1 = "#{@colors.key(code1[0..2])}#{@colors.key(code1[4..6])}#{@colors.key(code1[8..10])}#{@colors.key(code1[12..14])}"
 		correct_position = Board.correct_position(code1, secret_code)
 		wrong_position = Board.wrong_position(code1, secret_code)
-		[correct_position, wrong_position]
+		Computer.feedback_analyzer([correct_position, wrong_position])
 	end
 
 	def self.receive_feedback(secret_code)
@@ -145,6 +143,7 @@ end
 
 class Computer
 	@@i = -1
+	@@feedback = []
 	def make_secret_code
 		@code = "1|2|3|4"
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
@@ -153,20 +152,31 @@ class Computer
 	end
 
 	def feedback
-		p Board.receive_feedback(@code.dup)
+		Board.receive_feedback(@code.dup)
+	end
+
+	def self.feedback_analyzer(feedback1)
+		@@feedback = feedback1
+		p @@feedback[0]
 	end
 
 	def color_chooser
+		counter = 0
+		if @@feedback[0] != nil
+			counter += @@feedback[0]
+		end
+		p counter
 		@initial_guesses = [1111,2222,3333,4444,5555,6666]
 		@@i += 1
 		@initial_guesses[@@i]
 	end
 
-	def choose_colors
-		Board.add_color(1,@initial_guesses[@@i][0].to_i)
-		Board.add_color(2,@initial_guesses[@@i][1].to_i)
-		Board.add_color(3,@initial_guesses[@@i][2].to_i)
-		Board.add_color(4,@initial_guesses[@@i][3].to_i)
+	def choose_colors(guess)
+		p guess
+		Board.add_color(1,guess.to_s[0])
+		Board.add_color(2,guess.to_s[1])
+		Board.add_color(3,guess.to_s[2])
+		Board.add_color(4,guess.to_s[3])
 	end
 end
 	
@@ -210,7 +220,7 @@ class Moderator
 				puts "You lose!"
 				puts "The secret code was #{computer.code}"
 				break
-			end
+			end 
 			i += 1
 		end
 	end
@@ -244,3 +254,16 @@ class Moderator
 
 	end
 end
+
+computer = Computer.new
+player = Player.new
+board = Board.new
+player.make_secret_code
+computer.choose_colors(computer.color_chooser)
+board.save
+player.feedback
+p board.display
+board.board_reset
+computer.choose_colors(computer.color_chooser)
+p board.display
+
