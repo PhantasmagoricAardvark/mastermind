@@ -20,6 +20,9 @@ class Board
 
 	def self.add_color(position, color_num)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
+		p "position is #{position}"
+		p "color_num.to_i is #{color_num.to_i}"
+		p "@colors[color_num] is #{@colors[color_num.to_i]}"
 		@@board.sub!(position.to_s,@colors[color_num.to_i])
 	end
 
@@ -27,6 +30,9 @@ class Board
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
 		code1 = @@boards[-1]
 		code1 = "#{@colors.key(code1[0..2])}#{@colors.key(code1[4..6])}#{@colors.key(code1[8..10])}#{@colors.key(code1[12..14])}"
+		if code1 == secret_code
+			return true
+		end
 		correct_position = Board.correct_position(code1, secret_code)
 		wrong_position = Board.wrong_position(code1, secret_code)
 		Computer.feedback_analyzer([correct_position, wrong_position])
@@ -144,6 +150,11 @@ end
 class Computer
 	@@i = -1
 	@@feedback = []
+	@@later_guesses = []
+	@@previous_guesses = []
+	@@counter = 0
+
+
 	def make_secret_code
 		@code = "1|2|3|4"
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
@@ -157,22 +168,31 @@ class Computer
 
 	def self.feedback_analyzer(feedback1)
 		@@feedback = feedback1
-		p @@feedback[0]
 	end
 
 	def color_chooser
-		counter = 0
-		if @@feedback[0] != nil
-			counter += @@feedback[0]
+		p @@counter
+		if @@counter == 4
+			guess = @@later_guesses.shuffle.join("")
+			while @@previous_guesses.include?(guess)
+				guess = @@later_guesses.shuffle.join("")
+			end
+			p guess
+			@@previous_guesses.push(guess)
+			return guess
+		elsif @@feedback[0] != nil
+			@@counter += @@feedback[0]
+			p @@feedback[0]
+			@@feedback[0].times {@@later_guesses.push((@initial_guesses[@@i].to_s)[0])}
 		end
-		p counter
+		p @@later_guesses
 		@initial_guesses = [1111,2222,3333,4444,5555,6666]
 		@@i += 1
 		@initial_guesses[@@i]
 	end
 
 	def choose_colors(guess)
-		p guess
+		p guess.to_s
 		Board.add_color(1,guess.to_s[0])
 		Board.add_color(2,guess.to_s[1])
 		Board.add_color(3,guess.to_s[2])
@@ -232,21 +252,23 @@ class Moderator
 		player.make_secret_code
 		i = 0
 		while i < 12
-			puts
-			puts @@colors
-			player.choose_colors
+			computer.choose_colors(computer.color_chooser)
+			puts 	
 			board.save
-			if computer.feedback == true
-				puts "You guessed the secret code!"
-				puts "You win!"
-				break
-			end	
+			player.feedback
+			puts "The computer guessed #{board.display}"
 			puts
-			puts "Current board: " + board.display
 			board.board_reset
-			if i == 11
+			puts board.boards
+			if player.feedback == true
+				puts
+				puts "The computer guessed the secret code!"
 				puts "You lose!"
-				puts "The secret code was #{computer.code}"
+				break
+			elsif i == 11
+				puts
+				puts "You win!"
+				puts "The computer did not guess the secret code!"
 				break
 			end
 			i += 1
@@ -255,15 +277,5 @@ class Moderator
 	end
 end
 
-computer = Computer.new
-player = Player.new
-board = Board.new
-player.make_secret_code
-computer.choose_colors(computer.color_chooser)
-board.save
-player.feedback
-p board.display
-board.board_reset
-computer.choose_colors(computer.color_chooser)
-p board.display
-
+Moderator.computer_guesses
+# try 1612
