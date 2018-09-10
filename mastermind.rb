@@ -20,9 +20,6 @@ class Board
 
 	def self.add_color(position, color_num)
 		@colors = {1 => "red", 2 => "grn", 3 => "blu", 4 => "ylw", 5 => "blc", 6 => "wht"}
-		p "position is #{position}"
-		p "color_num.to_i is #{color_num.to_i}"
-		p "@colors[color_num] is #{@colors[color_num.to_i]}"
 		@@board.sub!(position.to_s,@colors[color_num.to_i])
 	end
 
@@ -171,8 +168,9 @@ class Computer
 	end
 
 	def color_chooser
-		p @@counter
+		p "@@counter is #{@@counter}"
 		if @@counter == 4
+			p "@@later_guesses #{@@later_guesses}"
 			guess = @@later_guesses.shuffle.join("")
 			while @@previous_guesses.include?(guess)
 				guess = @@later_guesses.shuffle.join("")
@@ -181,9 +179,19 @@ class Computer
 			@@previous_guesses.push(guess)
 			return guess
 		elsif @@feedback[0] != nil
+			p "@@feedback[0] is #{@@feedback[0]}"
 			@@counter += @@feedback[0]
-			p @@feedback[0]
 			@@feedback[0].times {@@later_guesses.push((@initial_guesses[@@i].to_s)[0])}
+		end
+		if @@counter == 4
+			p "@@later_guesses #{@@later_guesses}"
+			guess = @@later_guesses.shuffle.join("")
+			while @@previous_guesses.include?(guess)
+				guess = @@later_guesses.shuffle.join("")
+			end
+			p guess
+			@@previous_guesses.push(guess)
+			return guess
 		end
 		p @@later_guesses
 		@initial_guesses = [1111,2222,3333,4444,5555,6666]
@@ -192,11 +200,15 @@ class Computer
 	end
 
 	def choose_colors(guess)
-		p guess.to_s
+		p "guess is #{guess}"
 		Board.add_color(1,guess.to_s[0])
 		Board.add_color(2,guess.to_s[1])
 		Board.add_color(3,guess.to_s[2])
 		Board.add_color(4,guess.to_s[3])
+	end
+
+	def code
+		@code
 	end
 end
 	
@@ -277,5 +289,4 @@ class Moderator
 	end
 end
 
-Moderator.computer_guesses
-# try 1612
+Moderator.game
